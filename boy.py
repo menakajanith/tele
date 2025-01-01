@@ -70,7 +70,6 @@ async def handle_button(update: Update, context) -> None:
             # Validate that the name contains only Sinhala, English letters, and spaces
             if not re.match(r"^[\u0D80-\u0DFFA-Za-z\s]+$", user_name):
                 await update.message.reply_text("කරුණාකර නමට පමණක් අකුරු සහ ස්පේස් ලබා දෙන්න. (අංක සහ විශේෂ දේවල් ඇඩ් කිරිමේන වලකින්න)")
-
                 return  # Skip the next steps if the name is invalid
 
             # Check if the entered name matches the Telegram username (case insensitive)
@@ -125,7 +124,7 @@ async def handle_button(update: Update, context) -> None:
 
             # Send the user's profile picture first (only in private chat)
             user = update.effective_user
-            photos = await user.get_profile_photos()
+            photos = await context.bot.get_user_profile_photos(update.effective_user.id)
 
             # Check if the user has a profile photo
             if photos.total_count > 0:
@@ -154,6 +153,7 @@ async def handle_button(update: Update, context) -> None:
                 reply_markup=InlineKeyboardMarkup(keyboard)  # Add inline button
             )
 
+# Handle the callback query when the user clicks on the inline "Send Now" button
 # Callback function to handle the inline button click
 async def handle_callback(update: Update, context) -> None:
     query = update.callback_query
@@ -196,19 +196,25 @@ async def handle_callback(update: Update, context) -> None:
                                        reply_markup=ReplyKeyboardMarkup([ 
                                            [KeyboardButton("About"), KeyboardButton("Request")] 
                                        ], resize_keyboard=True))
-        # Clear user data after completion
+        
+        # Clear user data and reset the request step
         context.user_data.clear()
 
-# Set up the application
-def main():
-    application = Application.builder().token("7611728916:AAGryNP6Uhhea7ar6_hxVFvTf8PYraCDAVU").build()  # Replace with your bot's API key
+        # Optionally, send a new message or reset the bot state
+        await query.message.reply_text("ඔබගේ කතාව සාර්ථකව යවා ඇත. තාව මොන හරි තියෙ නම් පහත බොත්තම ඔබන්න.", 
+                                      reply_markup=ReplyKeyboardMarkup([
+                                          [KeyboardButton("About"), KeyboardButton("Request")]
+                                      ], resize_keyboard=True))
 
-    # Register handlers
+
+# Set up the bot and handlers
+def main():
+    application = Application.builder().token("7611728916:AAGryNP6Uhhea7ar6_hxVFvTf8PYraCDAVU").build()
+
     application.add_handler(CommandHandler("start", start))
     application.add_handler(MessageHandler(filters.TEXT & ~filters.COMMAND, handle_button))
     application.add_handler(CallbackQueryHandler(handle_callback))
 
-    # Run the bot
     application.run_polling()
 
 if __name__ == "__main__":
