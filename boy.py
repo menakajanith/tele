@@ -38,7 +38,7 @@ async def handle_button(update: Update, context) -> None:
     # Only process the button actions if it's in a private chat
     if update.message.chat.type == "private":
         if update.message.text == "About":
-            image_path = "lo1.jpg"  # Replace with actual local image path
+            image_path = "lo.jpg"  # Replace with actual local image path
 
             with open(image_path, 'rb') as image_file:
                 await update.message.reply_photo(
@@ -132,7 +132,7 @@ async def handle_button(update: Update, context) -> None:
                 photo = photos.photos[0][-1]  # Get the highest resolution image
             else:
                 # Default image if no profile photo exists
-                photo = "lo.jpg"  # Replace with your default image path
+                photo = "lo2.jpg"  # Replace with your default image path
 
             # Create a caption with the user's details and story
             caption = (
